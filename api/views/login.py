@@ -21,4 +21,4 @@ def login_c(request, args):
     # 拼装用户信息存session
     request.session['admInfo'] = res.to_dict()
 
-    return suc(res.to_dict(), '登录成功1')
+    return suc(res.to_dict(), '登录成功')
