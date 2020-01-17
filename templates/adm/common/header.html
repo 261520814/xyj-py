@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+{% load static %}
+{% csrf_token %}
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="{% static 'adm/css/font.css' %}">
+    <link rel="stylesheet" href="{% static 'adm/css/xadmin.css' %}">
+    <link rel="stylesheet" href="{% static 'adm/lib/layui/css/layui.css' %}">
+    <script src="{% static 'adm/js/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'adm/lib/layui/layui.js' %}" charset="utf-8"></script>
+    <script type="text/javascript" src="{% static 'adm/js/xadmin.js' %}"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+      <script>
+          function httpUrl(url="", data, callback, type="POST") {
+            //$(".pop").show(); //打开loading#
+            data.csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val()
+            $.ajax({
+                type : type,
+                url : url,
+                data : data,
+                dataType : "json",
+                success : function (data) {
+                    callback(data)
+                    //return data;
+                },
+                complete : function () {
+                    //$(".pop").hide(); //关闭loading
+                }
+            });
+        }
+      </script>
+  </head>

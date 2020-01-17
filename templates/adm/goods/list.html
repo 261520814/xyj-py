@@ -1,0 +1,268 @@
+{% include '../common/header.html' with title="微孝商品" %}
+  {% load dealwithtime %}
+  <body>
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">商品管理</a>
+        <a>
+          <cite>微孝商品列表</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-primary layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:38px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+      <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+          <input class="layui-input" placeholder="开始日" name="start" id="start" value="{{ request.GET.start }}">
+          <input class="layui-input" placeholder="截止日" name="end" id="end" value="{{ request.GET.end }}">
+{#          <div class="layui-input-inline">#}
+{#            <select name="contrller">#}
+{#              <option>支付状态</option>#}
+{#              <option>已支付</option>#}
+{#              <option>未支付</option>#}
+{#            </select>#}
+{#          </div>#}
+{#          <div class="layui-input-inline">#}
+{#            <select name="contrller">#}
+{#              <option>支付方式</option>#}
+{#              <option>支付宝</option>#}
+{#              <option>微信</option>#}
+{#              <option>货到付款</option>#}
+{#            </select>#}
+{#          </div>#}
+          <div class="layui-input-inline">
+            <select name="shopType">
+              <option value="">全部类型</option>
+              <option value="0"{% if request.GET.shopType|intVal == 0 %} selected{% endif %}>普通商品</option>
+              <option value="1"{% if request.GET.shopType|intVal == 1 %} selected{% endif %}>话费直冲</option>
+              <option value="2"{% if request.GET.shopType|intVal == 2 %} selected{% endif %}>微能券码</option>
+              <option value="3"{% if request.GET.shopType|intVal == 3 %} selected{% endif %}>京东直购</option>
+              <option value="4"{% if request.GET.shopType|intVal == 4 %} selected{% endif %}>本地券码</option>
+              <option value="5"{% if request.GET.shopType|intVal == 5 %} selected{% endif %}>商超</option>
+              <option value="6"{% if request.GET.shopType|intVal == 6 %} selected{% endif %}>鲜花</option>
+            </select>
+          </div>
+          <input type="text" name="name" value="{{ request.GET.name }}" placeholder="请输入商品名称" autocomplete="off" class="layui-input">
+          <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+        </form>
+      </div>
+       <form class="layui-form" ay-filter="component-form-group">
+        <div class="layui-form-item">
+{#            <label class="layui-form-label">平台</label>#}
+            <div class="layui-input-block" style="margin-left: 0px;">
+                {% for foo in ditch %}
+                <input type="checkbox" name="ditch[]" value="{{ foo.id }}" {% if foo.checked %}checked{% endif %} title="{{foo.name}}"><div class="layui-unselect layui-form-checkbox "><span>{{foo.name}}</span><i class="layui-icon layui-icon-ok"></i></div>
+                {% endfor %}
+                <button class="layui-btn layui-btn-xs" style="margin-top: 4px;" lay-filter="addDitch" lay-submit="">确定</button>
+{#          </div>
+
+          </div>
+       </form>
+      <xblock>
+        <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
+        <button class="layui-btn" onclick="x_admin_show('添加用户','./order-add.html')"><i class="layui-icon"></i>添加</button>
+        <span class="x-right" style="line-height:40px">共有数据：{{ paginator.count }} 条</span>
+      </xblock>
+      <table class="layui-table">
+        <thead>
+          <tr>
+            <th>
+              <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
+            </th>
+            <th>ID</th>
+            <th>板块</th>
+            <th>缩略图</th>
+            <th>商品名称</th>
+            <th>商品类型</th>
+            <th>商品价格</th>
+            <th>存入金额</th>
+            <th>参与时长</th>
+            <th>发放周期</th>
+            <th>状态</th>
+            <th >操作</th>
+            </tr>
+        </thead>
+        <tbody>
+        {%  for row in list %}
+          <tr>
+            <td>
+              <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='{{ row.id }}'><i class="layui-icon">&#xe605;</i></div>
+            </td>
+            <td>{{row.id}}</td>
+            <td>{{row.chunk_name}}</td>
+            <td><img src="{{row.img}}" width="60" /></td>
+            <td>{{row.name}}</td>
+            <td>{{row.shop_type|getShopType}}</td>
+            <td>{{row.money}}</td>
+            <td>{{row.money_ck}}</td>
+            <td>{{row.protecttype|getProtect:row.protect}}</td>
+            <td>{{row.waytype|getProtect:row.way}}</td>
+            <td>{% if row.del_time == 1 %}下架{% else %}正常{% endif %}</td>
+            <td class="td-manage">
+              <a title="查看"  onclick="x_admin_show('编辑','order-view.html')" href="javascript:;">
+                <i class="layui-icon">&#xe63c;</i>
+              </a>
+              <a title="删除" onclick="member_del(this,{{row.id}})" href="javascript:;">
+                <i class="layui-icon">&#xe640;</i>
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <div class="page" id="page">
+        <div>
+          <a class="prev" href="">&lt;&lt;</a>
+          <a class="num" href="">1</a>
+          <span class="current">2</span>
+          <a class="num" href="">3</a>
+          <a class="num" href="">489</a>
+          <a class="next" href="">&gt;&gt;</a>
+        </div>
+      </div>
+
+    </div>
+    <script>
+        layui.use(['form','layer'], function(){
+            $ = layui.jquery;
+            var form = layui.form,layer = layui.layer;
+
+          //监听提交
+          form.on('submit(addDitch)', function(data){
+              var ids = ""
+              $.each(data.field,function(item, val){
+                  ids += val + '-'
+              })
+              console.log(ids)
+              ids = ids.slice(0,-1)
+              $(location).attr("href", "?ditch="+ids)
+            console.log(ids)
+            return false;
+
+          })
+        })
+        layui.use(['laypage', 'layer'], function(){
+          var laypage = layui.laypage, layer = layui.layer;
+            //我的自定义
+          laypage.render({
+            elem: 'page'
+            ,count: {{ paginator.count }}
+            ,limit:10
+            ,curr: {% if request.GET.page %}{{ request.GET.page }} {% else %}1{% endif %}
+            ,layout: ['count', 'prev', 'page', 'next', 'skip']
+            ,jump: function(obj, first){
+                  if(!first){
+                      //一定要加此判断，否则初始时会无限刷新
+                      $(location).attr('href', setParam("page",obj.curr){% comment %}"?page="+obj.curr{% endcomment %});
+                }
+            }
+          });
+        });
+
+      layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        
+        //执行一个laydate实例
+        laydate.render({
+          elem: '#start' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+          elem: '#end' //指定元素
+        });
+      });
+      function setParam(param,value){
+        var query = location.search.substring(1);
+        var p = new RegExp("(^|)" + param + "=([^&]*)(|$)");
+        if(p.test(query)){
+            //query = query.replace(p,"$1="+value);
+            var firstParam=query.split(param)[0];
+            var secondParam=query.split(param)[1];
+            if(secondParam.indexOf("&")>-1){
+                var lastPraam=secondParam.split("&")[1];
+                return  '?'+firstParam+'&'+param+'='+value+'&'+lastPraam;
+            }else{
+                if(firstParam){
+                    return '?'+firstParam+''+param+'='+value;
+                }else{
+                    return '?'+param+'='+value;
+                }
+            }
+        }else{
+            if(query == ''){
+                return '?'+param+'='+value;
+            }else{
+                return '?'+query+'&'+param+'='+value;
+            }
+        }
+    }
+       /*用户-停用*/
+      function member_stop(obj,id){
+          layer.confirm('确认要停用吗？',function(index){
+
+              if($(obj).attr('title')=='启用'){
+
+                //发异步把用户状态进行更改
+                $(obj).attr('title','停用')
+                $(obj).find('i').html('&#xe62f;');
+
+                $(obj).parents("tr").find(".td-status").find('span').addClass('layui-btn-disabled').html('已停用');
+                layer.msg('已停用!',{icon: 5,time:1000});
+
+              }else{
+                $(obj).attr('title','启用')
+                $(obj).find('i').html('&#xe601;');
+
+                $(obj).parents("tr").find(".td-status").find('span').removeClass('layui-btn-disabled').html('已启用');
+                layer.msg('已启用!',{icon: 5,time:1000});
+              }
+              
+          });
+      }
+
+      /*用户-删除*/
+      function member_del(obj,id){
+          layer.confirm('确认要删除吗？',function(index){
+              //发异步删除数据
+              httpUrl("{% url 'adm:goods_del' %}", {type:1, id:id}, function (resData) {
+                console.log(resData)
+                if( resData.code == 1 ){
+                    //成功
+                    $(obj).parents("tr").remove();
+                    layer.msg('已删除!',{icon:1,time:1000});
+                } else{
+                    //失败
+                    layer.msg(resData.msg,{icon:2,time:1000});
+                }
+            })
+          });
+      }
+
+
+
+      function delAll (argument) {
+
+        var data = tableCheck.getData();
+        console.log(data.join(","))
+          return false
+        layer.confirm('确认要删除选中的商品吗？',function(index){
+            //捉到所有被选中的，发异步进行删除
+            httpUrl("{% url 'adm:goods_del' %}", {type:0, id:data.join(",")}, function (resData) {
+                console.log(resData)
+                if( resData.code == 1 ){
+                    //成功
+                    layer.msg('删除成功', {icon: 1});
+                    $(".layui-form-checked").not('.header').parents('tr').remove();
+                } else{
+                    //失败
+                    layer.msg(resData.msg,{icon:2,time:1000});
+                }
+            })
+        });
+      }
+    </script>
+  </body>
+
+</html>

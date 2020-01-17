@@ -1,0 +1,116 @@
+ {% include '../common/header.html' with title="管理员" %}
+
+  <body>
+    <div class="x-body">
+        <form class="layui-form">
+            {% if res %}
+                <input type="hidden" name="id" value="{{ res.id }}">
+            {% endif %}
+          <div class="layui-form-item">
+            <label class="layui-form-label">平台类型</label>
+            <div class="layui-input-block">
+              <input type="radio" name="type" value="0" title="微信端" {% if res.type == 0 %}checked{% endif %}><div class="layui-unselect layui-form-radio layui-form-radioed"><i class="layui-anim layui-icon"></i><div>男</div></div>
+              <input type="radio" name="type" value="1" title="钱包SDK" {% if res.type == 1 %}checked{% endif %}><div class="layui-unselect layui-form-radio"><i class="layui-anim layui-icon"></i><div>女</div></div>
+              <input type="radio" name="type" value="2" title="APP嵌入" {% if res.type == 2 %}checked{% endif %}><div class="layui-unselect layui-form-radio layui-radio-disbaled layui-disabled"><i class="layui-anim layui-icon"></i><div>禁用</div></div>
+            </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="name" class="layui-form-label">
+                  <span class="x-red">*</span>平台名称
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="name" name="name" required lay-verify="name"
+                  autocomplete="off" class="layui-input" value="{{ res.name }}">
+              </div>
+              <div class="layui-form-mid layui-word-aux">
+                  <span class="x-red">*</span>输入平台的名称
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="sole" class="layui-form-label">
+                  <span class="x-red">*</span>唯一编号
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="sole" name="sole" required lay-verify="sole"
+                  autocomplete="off" class="layui-input" value="{{ res.sole }}">
+              </div>
+              <div class="layui-form-mid layui-word-aux">
+                  <span class="x-red">*</span>小鱼bank和金融云的渠道配置
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="upper" class="layui-form-label">
+                  <span class="x-red">*</span>签约上限
+              </label>
+              <div class="layui-input-inline">
+                  <input type="number" id="upper" name="upper" lay-verify="upper"
+                  autocomplete="off" class="layui-input" value="{{ res.upper }}">
+              </div>
+              <div class="layui-form-mid layui-word-aux">
+                  平台单用户签约金额上限
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="L_repass" class="layui-form-label">
+              </label>
+              <button  class="layui-btn" lay-filter="add" lay-submit="">
+                  提交
+              </button>
+          </div>
+      </form>
+    </div>
+    <script>
+        layui.use(['form','layer'], function(){
+            $ = layui.jquery;
+            var form = layui.form,layer = layui.layer;
+        
+              //自定义验证规则
+              form.verify({
+                name: function(value){
+                  if(value.length < 2){
+                    return '名称至少得2个字符啊';
+                  }
+                },
+                sole: function(value){
+                  if(value.length < 2){
+                    return '唯一编号不能为空';
+                  }
+                },
+
+              });
+
+          //监听提交
+          form.on('submit(add)', function(data){
+
+            if (!data.field.type || data.field.type == undefined) {
+                layer.msg("未选择类型",{icon:2,time:1000});return false
+            }
+
+            httpUrl("{% url 'adm:ditch_add_c' %}", data.field, function (resData) {
+                console.log(resData)
+                if( resData.code == 1 ){
+                    //成功
+                    //发异步，把数据提交给php
+                    layer.alert("提交成功", {icon: 6},function () {
+                        // 获得frame索引
+                        parent.location.reload()
+                        var index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                    });
+                } else{
+                    //失败
+                    layer.msg(resData.msg,{icon:2,time:1000});
+                }
+            })
+
+
+            return false;
+          });
+          
+          
+        });
+    </script>
+  </body>
+
+</html>
